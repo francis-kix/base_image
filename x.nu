@@ -5,6 +5,7 @@ export def gen [] {
     let g = (open $cfg).generate
     let paths = ls
     | where type == dir
+    | where {|x| $x.name | str starts-with  '.' | not $in }
     | get name
     generate $paths $g
 }

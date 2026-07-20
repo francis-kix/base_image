@@ -1,5 +1,5 @@
 generate:
-    user: iteainger
+    user: Francis-kix
     image: base_image
     registry: ghcr.io
     token_ref: secrets.GHCR_TOKEN
