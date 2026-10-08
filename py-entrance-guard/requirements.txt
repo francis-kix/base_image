@@ -8,6 +8,7 @@ PyYAML
 asyncmy
 pillow
 sqlalchemy
+greenlet
 httpx
 PyPDF2
 reportlab
