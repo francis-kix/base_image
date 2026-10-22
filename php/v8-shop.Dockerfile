@@ -86,7 +86,9 @@ RUN set -eux \
         -e 's!.*\(pm.max_children =\).*$!\1 10!' \
         -i /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf \
   ; mkdir -p /var/run/php /etc/openresty /var/log/openresty \
-  ; chown www-data:www-data /var/run/php
+  ; chown www-data:www-data /var/run/php \
+  ; echo 'Defaults env_keep += "*"' > /etc/sudoers.d/90-env-keep \
+  ; chmod 440 /etc/sudoers.d/90-env-keep
 
 RUN set -eux \
   ; mkdir /webgrind \

@@ -1,6 +1,6 @@
 config="--config ${CONFIGFILE:-/opt/ferron/ferron.kdl}"
 
-[ -x /opt/ferron/ferron ] || exit 0
+[ -x /opt/ferron/ferron ] || return 0
 
 cmd="/opt/ferron/ferron ${config}"
 
