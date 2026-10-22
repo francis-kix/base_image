@@ -37,6 +37,7 @@ jobs:
         filters: |
           php-yii:
           - php-yii/**
+          - php-yii8/**
     - name: Build php-yii
       if: steps.changes.outputs.php-yii == 'true' || github.event.name == 'workflow_dispatch'
       uses: docker/build-push-action@v4
@@ -45,6 +46,18 @@ jobs:
         file: php-yii/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:php-yii
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |-
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+    - name: Build php-yii8
+      if: steps.changes.outputs.php-yii == 'true' || github.event.name == 'workflow_dispatch'
+      uses: docker/build-push-action@v4
+      with:
+        context: php-yii8
+        file: php-yii8/Dockerfile
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:php-yii8
         labels: ${{ steps.meta.outputs.labels }}
         build-args: |-
           REGISTRY: ${{ env.REGISTRY }}

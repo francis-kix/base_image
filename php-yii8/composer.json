@@ -1,0 +1,128 @@
+{
+    "name": "yiisoft/yii2-app-advanced",
+    "description": "Yii 2 Advanced Project Template",
+    "keywords": ["yii2", "framework", "advanced", "project template"],
+    "homepage": "https://www.yiiframework.com/",
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/yiisoft/yii2/issues?state=open",
+        "forum": "https://www.yiiframework.com/forum/",
+        "wiki": "https://www.yiiframework.com/wiki/",
+        "irc": "ircs://irc.libera.chat:6667/yii2",
+        "source": "https://github.com/yiisoft/yii2"
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.1",
+        "aliyuncs/oss-sdk-php": "^2.4",
+        "cebe/markdown": "^1.2",
+        "creocoder/yii2-nested-sets": "^0.9.0",
+        "doctrine/lexer": "^1.2 || ^2.0 || ^3.0",
+        "egulias/email-validator": "^3.1 || ^4.0",
+        "ezyang/htmlpurifier": "^4.13",
+        "fakerphp/faker": "^1.13",
+        "firebase/php-jwt": "^5.2 || ^6.0",
+        "iisns/yii2-webuploader": "*",
+        "imagine/imagine": "^0.5.0 || ^1.0",
+        "kzykhys/steganography": "dev-master",
+        "linslin/yii2-curl": "^1.5",
+        "kartik-v/yii2-dynagrid": "*",
+        "kartik-v/yii2-tree-manager": "@dev",
+        "kartik-v/yii2-export": "*",
+        "kartik-v/yii2-editable": "*",
+        "kartik-v/yii2-date-range": "*",
+        "kartik-v/yii2-detail-view": "*",
+        "kartik-v/yii2-widgets": "*",
+        "kartik-v/yii2-widget-fileinput": "@dev",
+        "kartik-v/bootstrap-fileinput": "^5.2",
+        "kartik-v/yii2-krajee-base": "*",
+        "kartik-v/yii2-grid": "*",
+        "kartik-v/yii2-sortable": "*",
+        "kartik-v/yii2-widget-activeform": "*",
+        "kartik-v/yii2-widget-select2": "*",
+        "kartik-v/yii2-bootstrap4-dropdown": "*",
+        "kartik-v/yii2-dialog": "*",
+        "maennchen/zipstream-php": "^2.1 || ^3.0",
+        "markbaker/complex": "^3.0",
+        "markbaker/matrix": "^3.0",
+        "mdmsoft/yii2-admin": "*",
+        "moonlandsoft/yii2-phpexcel": "*",
+        "mpdf/mpdf": "^8.2",
+        "myclabs/deep-copy": "^1.10",
+        "myclabs/php-enum": "^1.8",
+        "opis/closure": "^3.6",
+        "phpoffice/phpspreadsheet": "^3.3",
+        "phpoffice/math": "*",
+        "phpoffice/phpword": "^1.2",
+        "phpspec/php-diff": "^1.1",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0",
+        "psr/http-message": "^1.0",
+        "psr/log": "^1.1 || ^2.0 || ^3.0",
+        "psr/simple-cache": "^1.0 || ^2.0 || ^3.0",
+        "select2/select2": "^4.0",
+        "setasign/fpdi": "^2.3",
+        "swiftmailer/swiftmailer": "^6.3",
+        "symfony/options-resolver": "^2.8",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-intl-idn": "*",
+        "symfony/polyfill-intl-normalizer": "*",
+        "symfony/polyfill-mbstring": "*",
+        "yidas/yii2-bower-asset": "^2.0",
+        "yiidoc/yii2-redactor": "*",
+        "yiisoft/yii2": "^2.0.55",
+        "yiisoft/yii2-bootstrap": "^2.0",
+        "yiisoft/yii2-codeception": "*",
+        "yiisoft/yii2-composer": "*",
+        "yiisoft/yii2-elasticsearch": "*",
+        "yiisoft/yii2-imagine": "*",
+        "yiisoft/yii2-redis": "*",
+        "yiisoft/yii2-swiftmailer": "*",
+        "yiisoft/yii2-queue": "*",
+        "symfony/process": "^5.4",
+        "ext-json": "*",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "yiisoft/yii2-debug": "*",
+        "yiisoft/yii2-gii": "*",
+        "yiisoft/yii2-faker": "*",
+        "phpunit/phpunit": "^9.6 || ^10.0",
+        "codeception/codeception": "^5.0",
+        "codeception/lib-innerbrowser": "*",
+        "codeception/module-asserts": "*",
+        "codeception/module-yii2": "*",
+        "codeception/module-filesystem": "*",
+        "codeception/verify": "*",
+        "symfony/browser-kit": "*"
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        },
+        "process-timeout": 1800,
+        "fxp-asset": {
+            "enabled": false
+        },
+        "platform": {
+            "php": "8.4.16"
+        },
+        "policy": {
+            "advisories": {
+                "block": false
+            }
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://mirrors.aliyun.com/composer/",
+            "canonical": false
+        },
+        {
+            "type": "composer",
+            "url": "https://repo.packagist.org/"
+        }
+    ]
+}
