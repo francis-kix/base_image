@@ -1,0 +1,6 @@
+# force LF for shell scripts so Docker images don't get CRLF-broken entrypoints
+*.sh text eol=lf
+srv text eol=lf
+setup-php text eol=lf
+*.Dockerfile text eol=lf
+Dockerfile text eol=lf

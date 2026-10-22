@@ -1,0 +1,18 @@
+#!/bin/bash
+# service launcher: replicates the "srv" entrypoint of the old io:base image
+touch /var/run/services
+mkdir -p /var/run/php
+
+if [ -n "$PREBOOT" ] && [ -f "$PREBOOT" ]; then
+    bash "$PREBOOT"
+fi
+
+for s in /entrypoint/*.sh; do
+    [ -f "$s" ] && . "$s"
+done
+
+if [ -n "$STARTUP_SCRIPT" ] && [ -f "$STARTUP_SCRIPT" ]; then
+    bash "$STARTUP_SCRIPT"
+fi
+
+wait

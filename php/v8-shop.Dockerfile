@@ -1,15 +1,40 @@
 ARG PHP_VERSION=8.4
-# build:2 php8.4 + openresty + dropbear, for shop-mro
 FROM ghcr.io/orbsh/assets:dropbear AS dropbear
-FROM ghcr.io/fj0r/io:base
-COPY --from=dropbear / /
+FROM debian:bookworm-slim
+COPY --from=dropbear /bin/ /out/dropbear/bin/
+COPY --from=dropbear /libexec/ /out/dropbear/libexec/
+RUN ln -sf /out/dropbear/bin/dropbear /usr/bin/dropbear \
+  ; ln -sf /out/dropbear/bin/dropbearkey /usr/bin/dropbearkey \
+  ; ln -sf /out/dropbear/bin/dropbearconvert /usr/bin/dropbearconvert \
+  ; ln -sf /out/dropbear/bin/dbclient /usr/bin/dbclient \
+  ; ln -sf /out/dropbear/bin/scp /usr/bin/scp \
+  ; ln -sf /out/dropbear/libexec/sftp-server /usr/lib/sftp-server
 
-EXPOSE 8080
+EXPOSE 80 8080 22
 
 ENV TIMEZONE=Asia/Shanghai
 
+RUN set -eux \
+  ; apt-get update \
+  ; apt-get install -y --no-install-recommends \
+        ca-certificates curl jq unzip sudo procps tzdata gnupg \
+    ; ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime \
+    ; echo $TIMEZONE > /etc/timezone
+
+RUN set -eux \
+  ; curl -fsSL https://openresty.org/package/pubkey.gpg \
+      | gpg --dearmor -o /usr/share/keyrings/openresty.gpg \
+  ; echo "deb [signed-by=/usr/share/keyrings/openresty.gpg] http://openresty.org/package/debian bookworm openresty" \
+      > /etc/apt/sources.list.d/openresty.list \
+  ; apt-get update \
+  ; apt-get install -y --no-install-recommends openresty \
+  ; apt-get remove -y gnupg \
+  ; apt-get autoremove -y \
+  ; apt-get clean -y \
+  ; rm -rf /var/lib/apt/lists/*
+
 ARG PHP_VERSION
-ARG DEBIAN_SOURCE=trixie
+ARG DEBIAN_SOURCE=bookworm
 ENV PHP_VERSION=${PHP_VERSION}
 ENV PHP_PKGS \
         php${PHP_VERSION} \
@@ -29,18 +54,14 @@ ENV PHP_PKGS \
         php${PHP_VERSION}-intl \
         php${PHP_VERSION}-redis \
         php${PHP_VERSION}-ast \
-        php${PHP_VERSION}-pcntl \
         php${PHP_VERSION}-xdebug
 
 RUN set -eux \
-  ; apt-get update \
-  ; apt-get install -y --no-install-recommends gnupg software-properties-common \
   ; curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg \
   ; echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ ${DEBIAN_SOURCE} main" \
     | tee /etc/apt/sources.list.d/php.list \
   ; apt-get update \
   ; apt-get install -y --no-install-recommends $PHP_PKGS \
-  ; apt-get remove -y gnupg software-properties-common \
   ; apt-get autoremove -y \
   ; apt-get clean -y \
   ; rm -rf /var/lib/apt/lists/* \
@@ -64,18 +85,21 @@ RUN set -eux \
         -e 's!.*\(pm.max_spare_servers =\).*$!\1 10!' \
         -e 's!.*\(pm.max_children =\).*$!\1 10!' \
         -i /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf \
-  ; mkdir -p /var/run/php
+  ; mkdir -p /var/run/php /etc/openresty /var/log/openresty \
+  ; chown www-data:www-data /var/run/php
 
 RUN set -eux \
   ; mkdir /webgrind \
-  ; webgrind_ver=$(curl --retry 3 -fsSL https://api.github.com/repos/jokkedk/webgrind/releases/latest | jq -r '.tag_name') \
-  ; webgrind_url="https://github.com/jokkedk/webgrind/archive/refs/tags/${webgrind_ver}.tar.gz" \
-  ; curl --retry 3 -fsSL ${webgrind_url} | tar -zxf - -C /webgrind --strip-components=1 \
+  ; curl --retry 3 -fsSL https://github.com/jokkedk/webgrind/archive/refs/tags/v1.9.4.tar.gz \
+      | tar -zxf - -C /webgrind --strip-components=1 \
   ;
 
 COPY setup-php /setup-php
 COPY entrypoint /entrypoint/
+COPY srv /usr/local/bin/srv
 COPY index.php /srv/
+RUN sed -i 's/\r$//' /entrypoint/*.sh /usr/local/bin/srv /setup-php \
+  ; chmod +x /usr/local/bin/srv /entrypoint/*.sh
 CMD ["srv"]
 WORKDIR /srv
 
