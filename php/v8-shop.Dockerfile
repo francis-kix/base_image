@@ -1,4 +1,5 @@
 ARG PHP_VERSION=8.4
+# build:2 php8.4 + openresty + dropbear, for shop-mro
 FROM ghcr.io/orbsh/assets:dropbear AS dropbear
 FROM ghcr.io/fj0r/io:base
 COPY --from=dropbear / /

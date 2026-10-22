@@ -38,7 +38,7 @@ jobs:
           php:
           - php/**
     - name: Build php8-shop
-      if: steps.changes.outputs.php == 'true' || github.event.name == 'workflow_dispatch'
+      if: steps.changes.outputs.php == 'true' || github.event_name == 'workflow_dispatch'
       uses: docker/build-push-action@v4
       with:
         context: php
