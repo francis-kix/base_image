@@ -1,5 +1,6 @@
 ARG PHP_VERSION=8.4
-FROM ghcr.io/orbsh/assets:dropbear AS dropbear
+ARG DROPBEAR_IMAGE=ghcr.io/orbsh/assets:dropbear
+FROM ${DROPBEAR_IMAGE} AS dropbear
 FROM debian:bookworm-slim
 COPY --from=dropbear /bin/ /out/dropbear/bin/
 COPY --from=dropbear /libexec/ /out/dropbear/libexec/
@@ -17,14 +18,17 @@ ENV TIMEZONE=Asia/Shanghai
 RUN set -eux \
   ; apt-get update \
   ; apt-get install -y --no-install-recommends \
-        ca-certificates curl jq unzip sudo procps tzdata gnupg \
+        ca-certificates curl jq unzip procps tzdata gnupg \
     ; ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime \
     ; echo $TIMEZONE > /etc/timezone
 
+COPY versions.env /tmp/versions.env
+
 RUN set -eux \
+  ; . /tmp/versions.env \
   ; curl -fsSL https://openresty.org/package/pubkey.gpg \
       | gpg --dearmor -o /usr/share/keyrings/openresty.gpg \
-  ; echo "deb [signed-by=/usr/share/keyrings/openresty.gpg] http://openresty.org/package/debian bookworm openresty" \
+  ; echo "deb [signed-by=/usr/share/keyrings/openresty.gpg] http://openresty.org/package/debian ${OPENRESTY_DIST} openresty" \
       > /etc/apt/sources.list.d/openresty.list \
   ; apt-get update \
   ; apt-get install -y --no-install-recommends openresty \
@@ -34,7 +38,6 @@ RUN set -eux \
   ; rm -rf /var/lib/apt/lists/*
 
 ARG PHP_VERSION
-ARG DEBIAN_SOURCE=bookworm
 ENV PHP_VERSION=${PHP_VERSION}
 ENV PHP_PKGS \
         php${PHP_VERSION} \
@@ -57,8 +60,9 @@ ENV PHP_PKGS \
         php${PHP_VERSION}-xdebug
 
 RUN set -eux \
+  ; . /tmp/versions.env \
   ; curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg \
-  ; echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ ${DEBIAN_SOURCE} main" \
+  ; echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ ${SURY_DIST} main" \
     | tee /etc/apt/sources.list.d/php.list \
   ; apt-get update \
   ; apt-get install -y --no-install-recommends $PHP_PKGS \
@@ -86,13 +90,12 @@ RUN set -eux \
         -e 's!.*\(pm.max_children =\).*$!\1 10!' \
         -i /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf \
   ; mkdir -p /var/run/php /etc/openresty /var/log/openresty \
-  ; chown www-data:www-data /var/run/php \
-  ; echo 'Defaults env_keep += "*"' > /etc/sudoers.d/90-env-keep \
-  ; chmod 440 /etc/sudoers.d/90-env-keep
+  ; chown www-data:www-data /var/run/php
 
 RUN set -eux \
+  ; . /tmp/versions.env \
   ; mkdir /webgrind \
-  ; curl --retry 3 -fsSL https://github.com/jokkedk/webgrind/archive/refs/tags/v1.9.4.tar.gz \
+  ; curl --retry 3 -fsSL https://github.com/jokkedk/webgrind/archive/refs/tags/${WEBGRIND_VERSION}.tar.gz \
       | tar -zxf - -C /webgrind --strip-components=1 \
   ;
 

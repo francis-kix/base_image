@@ -1,8 +1,6 @@
-config="--config ${CONFIGFILE:-/opt/ferron/ferron.kdl}"
-
+# ferron is only present in ferron-based images (v8.Dockerfile); no-op otherwise
 [ -x /opt/ferron/ferron ] || return 0
 
-cmd="/opt/ferron/ferron ${config}"
+config="--config ${CONFIGFILE:-/opt/ferron/ferron.kdl}"
 
-eval "$cmd 2>&1 &"
-echo -n "$! " >> /var/run/services
+job ferron /opt/ferron/ferron $config

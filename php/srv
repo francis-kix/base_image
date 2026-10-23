@@ -1,7 +1,22 @@
 #!/bin/bash
-# service launcher: replicates the "srv" entrypoint of the old io:base image
+# mini job-queue service launcher
+# design borrowed from container-xy entrypoint/libs/tasks/jobs.nu:
+#   - tasks register via job(), spawned after all entrypoints complete
+#   - any-exit-kill-all: if ANY task exits, kill the rest and exit 1
+#     so the container runtime (K8s) restarts the whole container
+
 touch /var/run/services
 mkdir -p /var/run/php
+
+declare -a TASKS=()
+
+# register a long-running task: job <name> <cmd> [args...]
+job() {
+    local name=$1; shift
+    local line=$name a
+    for a in "$@"; do line+=$'\x1e'"$a"; done
+    TASKS+=("$line")
+}
 
 if [ -n "$PREBOOT" ] && [ -f "$PREBOOT" ]; then
     bash "$PREBOOT"
@@ -15,4 +30,27 @@ if [ -n "$STARTUP_SCRIPT" ] && [ -f "$STARTUP_SCRIPT" ]; then
     bash "$STARTUP_SCRIPT"
 fi
 
-wait
+total=0
+for line in "${TASKS[@]}"; do
+    IFS=$'\x1e' read -r -a argv <<< "$line"
+    "${argv[@]:1}" &
+    echo "srv: task ${argv[0]} started (pid $!)"
+    total=$((total + 1))
+done
+
+if [ "$total" -eq 0 ]; then
+    echo "srv: no tasks registered, sleeping forever"
+    exec tail -f /dev/null
+fi
+
+trap 'kill $(jobs -rp) 2>/dev/null; exit 143' TERM INT
+
+while sleep 5; do
+    active=$(jobs -rp | wc -l)
+    if [ "$active" -lt "$total" ]; then
+        echo "srv: task exited (active=${active}/${total}), killing all and exiting"
+        kill $(jobs -rp) 2>/dev/null
+        sleep 1
+        exit 1
+    fi
+done

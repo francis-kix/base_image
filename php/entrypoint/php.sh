@@ -1,7 +1,7 @@
+# run setup-php with env intact, then register php-fpm
 if [ -f /setup-php ]; then
-  sudo bash /setup-php
-  sudo touch /setup-php.$(date -Is)
+    bash /setup-php
+    touch "/setup-php.$(date -Is)"
 fi
 
-sudo /usr/sbin/php-fpm 2>&1 &
-echo -n "$! " | sudo tee -a /var/run/services > /dev/null
+job php-fpm /usr/sbin/php-fpm --nodaemonize

@@ -1,4 +1,3 @@
-#!/bin/bash
 # start openresty if installed; config default matches shop projects (/etc/openresty/nginx.conf)
 # note: sourced by srv, must use return instead of exit
 [ -x /usr/local/openresty/bin/openresty ] || return 0
@@ -11,8 +10,7 @@ mkdir -p /var/log/openresty /var/run/php
 /usr/local/openresty/bin/openresty -t -c "$conf" 2>&1 || return 0
 
 # append "daemon off" only when the config does not define it
-extra=""
-grep -Eq '^[[:space:]]*daemon[[:space:]]' "$conf" || extra="-g daemon off;"
+extra=()
+grep -Eq '^[[:space:]]*daemon[[:space:]]' "$conf" || extra=(-g 'daemon off;')
 
-/usr/local/openresty/bin/openresty -c "$conf" $extra 2>&1 &
-echo -n "$! " >> /var/run/services
+job nginx /usr/local/openresty/bin/openresty -c "$conf" ${extra[@]+"${extra[@]}"}
