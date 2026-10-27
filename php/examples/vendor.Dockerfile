@@ -23,7 +23,7 @@ ARG VENDOR_URL=http://file.s/vendor.tar.zst
 # 不做重试：file.s 偶尔会掐断长传输，那就让构建直接失败（解压侧报 unexpected EOF），
 # 不要拿重试掩盖上游问题。
 RUN set -eux \
-  ; curl -fsSL ${VENDOR_URL} | zstd -dc | tar -xf - -C /opt \
+  ; curl -fsSL ${VENDOR_URL} | zstd -d | tar -xf - -C /opt \
   ; test -d /opt/vendor \
   ;
 
