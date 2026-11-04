@@ -1,4 +1,4 @@
-# PHP 8 + ferron 3 layer on top of the deb base layer (see ./deb.Dockerfile).
+# PHP 8 + ferron 2.8 layer on top of the deb base layer (see ./deb.Dockerfile).
 ARG BASEIMAGE=iteainger/base_image:deb
 FROM ${BASEIMAGE}
 
@@ -29,23 +29,24 @@ ENV PHP_PKGS \
 
 RUN set -eux \
   ; apt-get update \
-  ; apt-get install -y --no-install-recommends $PHP_PKGS jq \
+  ; apt-get install -y --no-install-recommends $PHP_PKGS jq unzip \
   ; apt-get autoremove -y \
   ; apt-get clean -y \
   ; rm -rf /var/lib/apt/lists/* \
   ;
 
-# ferron 3 is a musl static build; subcommand form is `ferron run --config`.
-# Version is not pinned: newest stable 3.x, falling back to the newest 3.x
-# prerelease while 3.0 has not shipped (drop the fallback once it has).
+# ferron 2.8 is a musl static build; invoked as `ferron --config` (2.x has no `run` subcommand).
+# Version is not pinned: newest stable release on the 2.8.x line.
 RUN set -eux \
-  ; ferron_ver=$(curl --retry 3 -fsSL https://api.github.com/repos/ferronweb/ferron/releases | jq -r '[ .[] | select(.tag_name | startswith("3.")) ] as $r3 | ($r3 | map(select(.prerelease == false)) | first) // ($r3 | first) | .tag_name') \
+  ; ferron_ver=$(curl --retry 3 -fsSL https://api.github.com/repos/ferronweb/ferron/releases | jq -r '[ .[] | select(.tag_name | startswith("2.8.")) | select(.prerelease == false) | .tag_name ] | first') \
   ; test -n "$ferron_ver" -a "$ferron_ver" != "null" \
   ; echo "ferron ${ferron_ver}" \
-  ; ferron_url="https://github.com/ferronweb/ferron/releases/download/${ferron_ver}/ferron-${ferron_ver}-${ARCH}-unknown-linux-musl.tar.gz" \
-  ; curl --retry 3 -fsSL ${ferron_url} \
-    | tar -xzf - -C /usr/local/bin ferron ferron-fmt ferron-passwd \
-  ; /usr/local/bin/ferron version \
+  ; ferron_url="https://github.com/ferronweb/ferron/releases/download/${ferron_ver}/ferron-${ferron_ver}-${ARCH}-unknown-linux-musl.zip" \
+  ; curl --retry 3 -fsSL ${ferron_url} -o /tmp/ferron.zip \
+  ; unzip -o -q /tmp/ferron.zip ferron ferron-passwd -d /usr/local/bin \
+  ; chmod +x /usr/local/bin/ferron /usr/local/bin/ferron-passwd \
+  ; rm -f /tmp/ferron.zip \
+  ; /usr/local/bin/ferron --version \
   ;
 
 RUN set -eux \

@@ -15,5 +15,5 @@ done
 
 cfg=${CONFIGFILE:-/etc/ferron.conf}
 echo "Starting ferron with config ${cfg}"
-/usr/local/bin/ferron run --config "$cfg" > /proc/1/fd/1 2>&1 &
+/usr/local/bin/ferron --config "$cfg" > /proc/1/fd/1 2>&1 &
 echo -n "$! " | sudo tee -a /var/run/services > /dev/null
