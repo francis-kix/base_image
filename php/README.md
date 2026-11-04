@@ -47,3 +47,5 @@ ferron proxies to the socket php-fpm creates. Every background process writes it
 `/var/run/services`; any exit stops the container so the runtime restarts it.
 
 `CMD ["srv"]` (from the Dockerfile) = run services; no argument = interactive shell; anything else = batch mode.
+
+--
