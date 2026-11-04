@@ -2,12 +2,12 @@
 #
 #   podman build -f vendor.Dockerfile -t myapp-base:latest .
 #
-# 层级：iteainger/base_image:php（运行环境）→ 本镜像（业务基础镜像，备好 vendor）
+# 层级：francis-kix/base_image:php（运行环境）→ 本镜像（业务基础镜像，备好 vendor）
 # → 业务镜像（COPY 应用代码、把 vendor 接进 /srv）。同一份 vendor 可被多个业务镜像共用。
 #
 # 这类文件属于业务仓库，这里只作模板。放在 examples/ 下是有意的：x.nu gen 只
 # glob 镜像目录根部的 `*Dockerfile`，模板不能和 php/Dockerfile 并列。
-ARG BASEIMAGE=ghcr.io/iteainger/base_image:php
+ARG BASEIMAGE=ghcr.io/francis-kix/base_image:php
 FROM ${BASEIMAGE}
 
 ARG VENDOR_URL=http://file.s/vendor.tar.zst
@@ -32,5 +32,5 @@ RUN set -eux \
 #   COPY . /srv/
 #   RUN ln -sfn /opt/vendor /srv/vendor
 #
-# ENTRYPOINT 与 CMD ["srv"] 继承自 iteainger/base_image:php：php-fpm 与 ferron 由
+# ENTRYPOINT 与 CMD ["srv"] 继承自 francis-kix/base_image:php：php-fpm 与 ferron 由
 # /entrypoint 拉起，在 :8080 上服务 /srv。

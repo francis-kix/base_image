@@ -1,5 +1,5 @@
 # PHP 8 + ferron 2.8 layer on top of the deb base layer (see ./deb.Dockerfile).
-ARG BASEIMAGE=iteainger/base_image:deb
+ARG BASEIMAGE=francis-kix/base_image:deb
 FROM ${BASEIMAGE}
 
 ARG PHP_VERSION=8.4
