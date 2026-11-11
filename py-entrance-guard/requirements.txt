@@ -14,6 +14,8 @@ PyPDF2
 reportlab
 pypdfium2==4.18.0
 python-multipart
+qrcode
+boto3
 dashscope
 openai
 aiohttp
